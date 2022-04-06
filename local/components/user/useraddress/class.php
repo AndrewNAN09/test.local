@@ -43,8 +43,10 @@ class UserUserAddress extends CBitrixComponent {
 
         $this->_request = Application::getInstance()->getContext()->getRequest();
 
+
         CModule::IncludeModule('highloadblock');
         if(\Bitrix\Main\Engine\CurrentUser::get()->getId()) {
+            $id =  \Bitrix\Main\Engine\CurrentUser::get()->getId();
             $tableName = "useraddress";
             $hlblock = \Bitrix\Highloadblock\HighloadBlockTable::getList(
                 array("filter" => array(
@@ -56,10 +58,10 @@ class UserUserAddress extends CBitrixComponent {
                 $entity_data_class = $entity->getDataClass();
                 $res = $entity_data_class::getList(array('filter' => array()));
                 while ($item = $res->fetch()) {
-                    if ($item['UF_ACTIV'] == 0) {
-                        continue;
-                    } else {
+                    if ($item['UF_ID'] ==$id  && $item['UF_ACTIV'] != 0) {
                         $this->arResult['USER'][]['data'] = $item;
+                    } else {
+                        continue;
                     }
                 }
             }
