@@ -1,6 +1,33 @@
-<?php if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>
+<?php if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
+use \Bitrix\Main\Data\Cache;
+use \Bitrix\Main\Application;
+?>
 
 <?if(isset($arResult['USER'])) {
+
+    $cache = Cache::createInstance();
+    $taggedCache = Application::getInstance()->getTaggedCache();
+    $cachePath = 'mycachurl';
+    $cacheTtl = 3600;
+    $cacheKey = 'mycachekey';
+    if ($cache->initCache($cacheTtl, $cacheKey, $cachePath)) {
+        $vars = $cache->getVars();
+    } elseif ($cache->startDataCache()) {
+
+        $taggedCache->startTagCache($cachePath);
+        $vars = $arResult['USER'];
+
+        $taggedCache->registerTag('UserAddress');
+
+        $cacheInvalid = false;
+        if ($cacheInvalid) {
+            $taggedCache->abortTagCache();
+            $cache->abortDataCache();
+        }
+        $taggedCache->endTagCache();
+        $cache->endDataCache($vars);
+    }
+
     $APPLICATION->IncludeComponent('bitrix:main.ui.grid', '', [
         'GRID_ID' => 'report_list',
         'COLUMNS' => [
@@ -9,7 +36,7 @@
             ['id' => 'UF_ADDRRS', 'name' => 'Адрес', 'sort' => 'AMOUNT', 'default' => true],
 
         ],
-        'ROWS' => $arResult['USER'],
+        'ROWS' => $vars,
         'SHOW_ROW_CHECKBOXES' => true,
         'NAV_OBJECT' => $nav,
         'AJAX_MODE' => 'Y',

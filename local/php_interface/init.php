@@ -4,6 +4,9 @@ $eventManager = \Bitrix\Main\EventManager::getInstance();
 $eventManager->addEventHandler('', 'UserAddressOnAfterAdd', 'UserAddress');
 $eventManager->addEventHandler('', 'UserAddressOnAfterUpdate', 'UserAddress');
 $eventManager->addEventHandler('', 'UserAddressOnAfterDelete', 'UserAddress');
+use \Bitrix\Main\Application;
 function UserAddress() {
-    CBitrixComponent::clearComponentCache('user:useraddress');
+   $taggedCache = Application::getInstance()->getTaggedCache();
+   $taggedCache->clearByTag('UserAddress');
 }
+?>
